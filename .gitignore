@@ -1,0 +1,37 @@
+# Ignore Binaries, Intermediate, and Saved folders
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+
+# Ignore Visual Studio files
+.vs/
+*.sln
+*.vcxproj*
+*.user
+*.pdb
+*.opendb
+*.idb
+
+# Ignore log files
+*.log
+
+# Ignore compiled binaries and libraries
+*.dll
+*.exe
+*.app
+*.so
+*.dylib
+
+# Ignore object files and archives
+*.obj
+*.o
+*.lib
+*.a
+
+# Ignore auto-generated IDE files
+.idea/
+.vscode/
+
+# Ignore Unreal Engine Crash Reporter files
+*.pid
