@@ -1,4 +1,4 @@
-# Gameplay Abilities
+# First Person Abilities
 
 This project encapsulates several gameplay abilities for a FPS character in Unreal Engine 5.
 
