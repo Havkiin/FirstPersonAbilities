@@ -7,8 +7,6 @@
 // Sets default values for this component's properties
 UTelekinesisComponent::UTelekinesisComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
 	bIsMovingItem = false;
@@ -21,21 +19,15 @@ void UTelekinesisComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ACharacter* Character = Cast<ACharacter>(GetOwner());
-	if (IsValid(Character))
-	{
-		APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
-		if (IsValid(PlayerController))
-		{
-			if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
-			{
-				EnhancedInputComponent->BindAction(PickUpAction, ETriggerEvent::Triggered, this, &UTelekinesisComponent::PickUpItem);
-				EnhancedInputComponent->BindAction(PickUpAction, ETriggerEvent::Completed, this, &UTelekinesisComponent::ReleaseKey);
+	EnhancedInputComponent->BindAction(PickUpAction, ETriggerEvent::Triggered, this, &UTelekinesisComponent::PickUpItem);
+	EnhancedInputComponent->BindAction(PickUpAction, ETriggerEvent::Completed, this, &UTelekinesisComponent::ReleaseKey);
 
-				EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &UTelekinesisComponent::ThrowItem);
-			}
-		}
-	}
+	EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &UTelekinesisComponent::ThrowItem);
+
+	// Notify the player controller
+	EnhancedInputComponent->BindAction(PickUpAction, ETriggerEvent::Started, this, &UAbilityComponent::EnterAbility);
+	EnhancedInputComponent->BindAction(PickUpAction, ETriggerEvent::Completed, this, &UAbilityComponent::LeaveAbility);
+
 }
 
 void UTelekinesisComponent::PickUpItem(const FInputActionValue& Value)

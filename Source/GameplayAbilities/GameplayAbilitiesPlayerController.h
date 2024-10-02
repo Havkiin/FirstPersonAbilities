@@ -7,6 +7,8 @@
 #include "GameplayAbilitiesPlayerController.generated.h"
 
 class UInputMappingContext;
+class UAbilityComponent;
+class UEnhancedInputLocalPlayerSubsystem;
 
 /**
  *
@@ -16,16 +18,21 @@ class GAMEPLAYABILITIES_API AGameplayAbilitiesPlayerController : public APlayerC
 {
 	GENERATED_BODY()
 	
-protected:
+public:
 
-	/** Input Mapping Context to be used for player input */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UInputMappingContext* InputMappingContext;
+	void RegisterAbility(UAbilityComponent* Ability);
 
-	// Begin Actor interface
 protected:
 
 	virtual void BeginPlay() override;
 
-	// End Actor interface
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
+	UInputMappingContext* MovementMappingContext;
+
+	UEnhancedInputLocalPlayerSubsystem* InputSubsystem;
+	TArray<UInputMappingContext*> AbilityMappingContexts;
+
+	void AddOtherMappingContexts(UAbilityComponent* Ability);
+	void RemoveOtherMappingContexts(UAbilityComponent* Ability);
+
 };

@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "GameplayAbilitiesCharacter.h"
-#include "GameplayAbilitiesProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -39,22 +38,18 @@ AGameplayAbilitiesCharacter::AGameplayAbilitiesCharacter()
 	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
-	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
-	//TelekinesisComponent = CreateDefaultSubobject<UTelekinesisComponent>(TEXT("TelekinesisComponent"));
 	BlinkComponent = CreateDefaultSubobject<UBlinkComponent>(TEXT("BlinkComponent"));
+	TelekinesisComponent = CreateDefaultSubobject<UTelekinesisComponent>(TEXT("TelekinesisComponent"));
 
 	jumpCount = 0;
 }
 
 void AGameplayAbilitiesCharacter::BeginPlay()
 {
-	// Call the base class  
 	Super::BeginPlay();
 }
-
-//////////////////////////////////////////////////////////////////////////// Input
 
 void AGameplayAbilitiesCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {	
@@ -73,7 +68,7 @@ void AGameplayAbilitiesCharacter::SetupPlayerInputComponent(UInputComponent* Pla
 	}
 	else
 	{
-		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component!"), *GetNameSafe(this));
 	}
 }
 
@@ -108,6 +103,7 @@ bool AGameplayAbilitiesCharacter::CanJumpInternal_Implementation() const
 {
 	Super::CanJumpInternal_Implementation();
 
+	// Double jump
 	return jumpCount < 2;
 }
 

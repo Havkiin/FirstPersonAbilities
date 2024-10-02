@@ -7,11 +7,8 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 
-// Sets default values for this component's properties
 UBlinkComponent::UBlinkComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
 	bIsBlinkValid = false;
@@ -23,22 +20,16 @@ void UBlinkComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ACharacter* Character = Cast<ACharacter>(GetOwner());
-	if (IsValid(Character))
-	{
-		APlayerController* PlayerController = Cast<APlayerController>(Character->GetController());
-		if (IsValid(PlayerController))
-		{
-			if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
-			{
-				EnhancedInputComponent->BindAction(BlinkAction, ETriggerEvent::Triggered, this, &UBlinkComponent::PickBlinkLocation);
-				EnhancedInputComponent->BindAction(BlinkAction, ETriggerEvent::Completed, this, &UBlinkComponent::Blink);
+	EnhancedInputComponent->BindAction(BlinkAction, ETriggerEvent::Triggered, this, &UBlinkComponent::PickBlinkLocation);
+	EnhancedInputComponent->BindAction(BlinkAction, ETriggerEvent::Completed, this, &UBlinkComponent::Blink);
 
-				SpawnedComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, BlinkParticleSystem, FVector::ZeroVector, FRotator::ZeroRotator);
-				SpawnedComponent->SetVisibility(false, true);
-			}
-		}
-	}
+	// Notify the player controller
+	EnhancedInputComponent->BindAction(BlinkAction, ETriggerEvent::Started, this, &UAbilityComponent::EnterAbility);
+	EnhancedInputComponent->BindAction(BlinkAction, ETriggerEvent::Completed, this, &UAbilityComponent::LeaveAbility);
+
+	SpawnedParticleComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, BlinkParticleSystem, FVector::ZeroVector, FRotator::ZeroRotator);
+	SpawnedParticleComponent->SetVisibility(false, true);
+
 }
 
 void UBlinkComponent::PickBlinkLocation()
@@ -59,8 +50,9 @@ void UBlinkComponent::PickBlinkLocation()
 
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(PawnOwner);
+	UWorld* World = GetWorld();
 
-	GetWorld()->LineTraceSingleByChannel(BlockingHit, BlockingTraceStart, BlockingTraceEnd, ECollisionChannel::ECC_Pawn, QueryParams);
+	World->LineTraceSingleByChannel(BlockingHit, BlockingTraceStart, BlockingTraceEnd, ECollisionChannel::ECC_Pawn, QueryParams);
 
 	FHitResult BlinkHit;
 	FVector BlinkTraceStart = BlockingTraceEnd;
@@ -81,9 +73,9 @@ void UBlinkComponent::PickBlinkLocation()
 
 		FVector BlinkTraceEnd = BlinkTraceStart + FVector::DownVector * 350.0f;
 
-		bool bHit = GetWorld()->LineTraceSingleByChannel(BlinkHit, BlinkTraceStart, BlinkTraceEnd, ECollisionChannel::ECC_Pawn, QueryParams);
+		bool bHitDown = World->LineTraceSingleByChannel(BlinkHit, BlinkTraceStart, BlinkTraceEnd, ECollisionChannel::ECC_Pawn, QueryParams);
 
-		if (bHit)
+		if (bHitDown)
 		{
 			BlinkLocation = BlinkHit.Location + FVector(0.0f, 0.0f, characterHalfHeight);
 		}
@@ -92,29 +84,38 @@ void UBlinkComponent::PickBlinkLocation()
 	else
 	{
 		FVector BoxHalfSize = FVector(characterRadius, characterRadius, characterHalfHeight);
-		bool bHit = GetWorld()->SweepSingleByChannel(BlinkHit, BlockingTraceStart, BlockingTraceEnd, FQuat::Identity, ECollisionChannel::ECC_Pawn, FCollisionShape::MakeBox(BoxHalfSize), QueryParams);
+		bool bHit = World->SweepSingleByChannel(BlinkHit, BlockingTraceStart, BlockingTraceEnd, FQuat::Identity, ECollisionChannel::ECC_Pawn, FCollisionShape::MakeBox(BoxHalfSize), QueryParams);
 
 		if (bHit)
 		{
 			FVector CapsuleOffset = BlockingTraceEnd - BlockingTraceStart;
 			CapsuleOffset.Normalize();
 			CapsuleOffset *= characterRadius * 2.0f;
+			CapsuleOffset += FVector::UpVector * characterRadius * 2.0f;
 
-			BlinkLocation = BlinkHit.Location + CapsuleOffset;
+			BlinkTraceStart = BlinkHit.Location + CapsuleOffset;
+			FVector BlinkTraceEnd = BlinkTraceStart + FVector::DownVector * 350.0f;
+
+			bool bHitDown = World->LineTraceSingleByChannel(BlinkHit, BlinkTraceStart, BlinkTraceEnd, ECollisionChannel::ECC_Pawn, QueryParams);
+
+			if (bHitDown)
+			{
+				BlinkLocation = BlinkHit.Location + FVector(0.0f, 0.0f, characterHalfHeight);
+			}
 		}
 	}
 
 	if (BlinkHit.bBlockingHit)
 	{
 		bIsBlinkValid = true;
-		SpawnedComponent->SetWorldLocation(BlinkLocation - FVector(0.0f, 0.0f, characterHalfHeight));
+		SpawnedParticleComponent->SetWorldLocation(BlinkLocation - FVector(0.0f, 0.0f, characterHalfHeight));
 	}
 	else
 	{
 		bIsBlinkValid = false;
 	}
 
-	SpawnedComponent->SetVisibility(bIsBlinkValid, true);
+	SpawnedParticleComponent->SetVisibility(bIsBlinkValid, true);
 
 }
 
@@ -128,6 +129,6 @@ void UBlinkComponent::Blink()
 	{
 		PawnOwner->SetActorLocation(BlinkLocation);
 		bIsBlinkValid = false;
-		SpawnedComponent->SetVisibility(false, true);
+		SpawnedParticleComponent->SetVisibility(false, true);
 	}
 }

@@ -3,21 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "AbilityComponent.h"
 #include "BlinkComponent.generated.h"
 
 class UInputAction;
 class UNiagaraSystem;
 class UNiagaraComponent;
 
-
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class GAMEPLAYABILITIES_API UBlinkComponent : public UActorComponent
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class GAMEPLAYABILITIES_API UBlinkComponent : public UAbilityComponent
 {
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UBlinkComponent();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Data)
@@ -30,10 +28,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
 	UNiagaraSystem* BlinkParticleSystem;
 
-	UNiagaraComponent* SpawnedComponent;
+	UNiagaraComponent* SpawnedParticleComponent;
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	bool bIsBlinkValid;

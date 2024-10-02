@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "AbilityComponent.h"
 #include "GameFramework/Character.h"
 #include "EnhancedInputComponent.h"
 #include "NiagaraSystem.h"
@@ -13,7 +13,7 @@
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class GAMEPLAYABILITIES_API UTelekinesisComponent : public UActorComponent
+class GAMEPLAYABILITIES_API UTelekinesisComponent : public UAbilityComponent
 {
 	GENERATED_BODY()
 
