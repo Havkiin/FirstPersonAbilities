@@ -6,6 +6,9 @@
 #include "Engine/LocalPlayer.h"
 #include "AbilityComponent.h"
 #include "InputMappingContext.h"
+#include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameplayAbilitiesSaveGame.h"
 
 void AGameplayAbilitiesPlayerController::BeginPlay()
 {
@@ -16,6 +19,24 @@ void AGameplayAbilitiesPlayerController::BeginPlay()
 	{
 		// Add the mapping context so we get controls
 		InputSubsystem->AddMappingContext(MovementMappingContext, 0);
+	}
+
+	// Game save
+	USaveGame* gameSave;
+
+	if (!UGameplayStatics::DoesSaveGameExist("PlayerData", 0))
+	{
+		gameSave = UGameplayStatics::CreateSaveGameObject(UGameplayAbilitiesSaveGame::StaticClass());
+	}
+	else
+	{
+		gameSave = UGameplayStatics::LoadGameFromSlot("PlayerData", 0);
+	}
+
+	UGameplayAbilitiesSaveGame* projectGameSave = Cast<UGameplayAbilitiesSaveGame>(gameSave);
+	if (IsValid(projectGameSave))
+	{
+		GameSave = projectGameSave;
 	}
 }
 
@@ -28,6 +49,42 @@ void AGameplayAbilitiesPlayerController::RegisterAbility(UAbilityComponent* Abil
 	// Bind delegate to remove controls for other abilities while an ability is in use
 	Ability->OnEnterAbility.BindUObject(this, &AGameplayAbilitiesPlayerController::RemoveOtherMappingContexts);
 	Ability->OnLeaveAbility.BindUObject(this, &AGameplayAbilitiesPlayerController::AddOtherMappingContexts);
+}
+
+void AGameplayAbilitiesPlayerController::SetInputToUIOnly(UUserWidget* FocusWidget)
+{
+	FInputModeUIOnly inputMode;
+	inputMode.SetWidgetToFocus(FocusWidget->TakeWidget());
+	SetInputMode(inputMode);
+	bShowMouseCursor = true;
+}
+
+void AGameplayAbilitiesPlayerController::SetInputToGameOnly()
+{
+	FInputModeGameOnly inputMode;
+	SetInputMode(inputMode);
+	bShowMouseCursor = false;
+}
+
+float AGameplayAbilitiesPlayerController::GetBestTime(int levelIndex)
+{
+	float bestTime = 0.0f;
+
+	if (IsValid(GameSave))
+	{
+		bestTime = GameSave->BestTimes[levelIndex];
+	}
+
+	return bestTime;
+}
+
+void AGameplayAbilitiesPlayerController::SetBestTime(int levelIndex, float newTime)
+{
+	if (IsValid(GameSave))
+	{
+		GameSave->SetBestTime(levelIndex, newTime);
+		UGameplayStatics::SaveGameToSlot(GameSave, "PlayerData", 0);
+	}
 }
 
 void AGameplayAbilitiesPlayerController::AddOtherMappingContexts(UAbilityComponent* Ability)

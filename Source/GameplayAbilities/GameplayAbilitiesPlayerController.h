@@ -9,6 +9,8 @@
 class UInputMappingContext;
 class UAbilityComponent;
 class UEnhancedInputLocalPlayerSubsystem;
+class UUserWidget;
+class UGameplayAbilitiesSaveGame;
 
 /**
  *
@@ -20,6 +22,14 @@ class GAMEPLAYABILITIES_API AGameplayAbilitiesPlayerController : public APlayerC
 	
 public:
 
+	UFUNCTION(BlueprintCallable)
+	float GetBestTime(int levelIndex);
+
+	void SetBestTime(int levelIndex, float time);
+
+	void SetInputToUIOnly(UUserWidget* FocusWidget);
+	void SetInputToGameOnly();
+
 	void RegisterAbility(UAbilityComponent* Ability);
 
 protected:
@@ -29,6 +39,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputMappingContext* MovementMappingContext;
 
+	UGameplayAbilitiesSaveGame* GameSave;
+
+	/***** ABILITIES *****/
 	UEnhancedInputLocalPlayerSubsystem* InputSubsystem;
 	TArray<UInputMappingContext*> AbilityMappingContexts;
 
