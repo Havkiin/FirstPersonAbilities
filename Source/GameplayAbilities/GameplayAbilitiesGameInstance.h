@@ -16,8 +16,6 @@ class GAMEPLAYABILITIES_API UGameplayAbilitiesGameInstance : public UGameInstanc
 
 public:
 
-	UGameplayAbilitiesGameInstance();
-
 	UPROPERTY(BlueprintReadOnly)
 	int CurrentLevelIndex;
 	

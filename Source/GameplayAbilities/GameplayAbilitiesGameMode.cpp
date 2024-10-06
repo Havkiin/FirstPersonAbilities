@@ -7,9 +7,9 @@
 #include "GameplayAbilitiesHUD.h"
 #include "GameplayAbilitiesPlayerController.h"
 #include "GameplayAbilitiesGameInstance.h"
+#include "LevelEndZone.h"
 
-AGameplayAbilitiesGameMode::AGameplayAbilitiesGameMode()
-	: Super()
+AGameplayAbilitiesGameMode::AGameplayAbilitiesGameMode() : Super()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -18,9 +18,6 @@ AGameplayAbilitiesGameMode::AGameplayAbilitiesGameMode()
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonCharacter"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
-
-	Levels = { TEXT("Sandbox"), TEXT("Level1") };
-
 }
 
 void AGameplayAbilitiesGameMode::Tick(float DeltaTime)
@@ -39,20 +36,45 @@ void AGameplayAbilitiesGameMode::StartPlay()
 
 	LevelTime = 0.0f;
 
+	// Player controller setup
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (IsValid(playerController))
 	{
 		PlayerController = Cast<AGameplayAbilitiesPlayerController>(playerController);
+
+		// Character setup
+		APawn* playerPawn = PlayerController->GetPawn();
+		if (IsValid(playerPawn))
+		{
+			AGameplayAbilitiesCharacter* playerCharacter = Cast<AGameplayAbilitiesCharacter>(playerPawn);
+			if (IsValid(playerCharacter))
+			{
+				playerCharacter->OnCharacterDeath.AddUniqueDynamic(this, &AGameplayAbilitiesGameMode::RestartLevel);
+			}
+		}
 	}
 
+	// Game instance setup
 	UGameInstance* gameInstance = UGameplayStatics::GetGameInstance(GetWorld());
 	if (IsValid(gameInstance))
 	{
 		GameInstance = Cast<UGameplayAbilitiesGameInstance>(gameInstance);
+		GameInstance->CurrentLevelIndex = CurrentLevel;
+	}
+
+	// Level end zone setup
+	AActor* endZoneActor = UGameplayStatics::GetActorOfClass(GetWorld(), ALevelEndZone::StaticClass());
+	if (IsValid(endZoneActor))
+	{
+		ALevelEndZone* endZone = Cast<ALevelEndZone>(endZoneActor);
+		if (IsValid(endZone))
+		{
+			endZone->OnLevelEndRequest.AddUniqueDynamic(this, &AGameplayAbilitiesGameMode::EndLevel);
+		}
 	}
 }
 
-void AGameplayAbilitiesGameMode::EndCurrentLevel()
+void AGameplayAbilitiesGameMode::EndLevel()
 {
 	bIsLevelEnded = true;
 
@@ -81,7 +103,7 @@ void AGameplayAbilitiesGameMode::LoadLevel(int levelIndex)
 	}
 }
 
-void AGameplayAbilitiesGameMode::RestartCurrentLevel()
+void AGameplayAbilitiesGameMode::RestartLevel()
 {
 	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
 

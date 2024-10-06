@@ -11,7 +11,7 @@ void UGameplayAbilitiesSaveGame::SetBestTime(int levelIndex, float newTime)
 		BestTimes.SetNum(levelIndex + 1);
 		BestTimes[levelIndex] = newTime;
 	}
-	else if (newTime < BestTimes[levelIndex])
+	else if (newTime < BestTimes[levelIndex] || BestTimes[levelIndex] == 0.0f)
 	{
 		BestTimes[levelIndex] = newTime;
 	}

@@ -8,6 +8,8 @@
 
 class UCapsuleComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLevelEndRequest);
+
 UCLASS()
 class GAMEPLAYABILITIES_API ALevelEndZone : public AActor
 {
@@ -16,6 +18,9 @@ class GAMEPLAYABILITIES_API ALevelEndZone : public AActor
 public:
 
 	ALevelEndZone();
+
+	UPROPERTY(BlueprintAssignable, Category = Game)
+	FOnLevelEndRequest OnLevelEndRequest;
 
 protected:
 

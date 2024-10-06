@@ -17,6 +17,7 @@ class UBlinkComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterDeath);
 
 UCLASS(config=Game)
 class AGameplayAbilitiesCharacter : public ACharacter
@@ -60,11 +61,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
+	FOnCharacterDeath OnCharacterDeath;
+
 	virtual void OnJumped_Implementation() override;
 
 	virtual bool CanJumpInternal_Implementation() const override;
 
 	virtual void Landed(const FHitResult& Hit) override;
+
+	virtual void FellOutOfWorld(const class UDamageType& dmgType) override;
 
 	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }

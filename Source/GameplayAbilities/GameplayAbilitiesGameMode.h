@@ -18,8 +18,12 @@ public:
 
 	AGameplayAbilitiesGameMode();
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly)
 	TArray<FString> Levels;
+
+	// Temp, for test purposes only
+	UPROPERTY(EditDefaultsOnly)
+	int CurrentLevel;
 
 	UFUNCTION(BlueprintCallable)
 	float GetLevelTime() const;
@@ -36,13 +40,14 @@ public:
 	UFUNCTION (BlueprintCallable)
 	void LoadLevel(int levelIndex);
 
+	// Ends the current level and displays end score
 	UFUNCTION(BlueprintCallable)
-	void RestartCurrentLevel();
+	void EndLevel();
+
+	UFUNCTION(BlueprintCallable)
+	void RestartLevel();
 
 	virtual void StartPlay() override;
-
-	// Ends the current level and displays end score
-	void EndCurrentLevel();
 
 protected:
 

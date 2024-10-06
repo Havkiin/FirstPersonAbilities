@@ -2,8 +2,3 @@
 
 
 #include "GameplayAbilitiesGameInstance.h"
-
-UGameplayAbilitiesGameInstance::UGameplayAbilitiesGameInstance()
-{
-	CurrentLevelIndex = 1;
-}

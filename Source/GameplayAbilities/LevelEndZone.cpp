@@ -25,13 +25,6 @@ void ALevelEndZone::HandleOverlap(AActor* OverlappedActor, AActor* OtherActor)
 {
 	if (Cast<AGameplayAbilitiesCharacter>(OtherActor))
 	{
-		AGameModeBase* GameModeBase = GetWorld()->GetAuthGameMode();
-		AGameplayAbilitiesGameMode* GameMode = Cast<AGameplayAbilitiesGameMode>(GameModeBase);
-
-		if (IsValid(GameMode))
-		{
-			GameMode->EndCurrentLevel();
-		}
-			
+		OnLevelEndRequest.Broadcast();
 	}
 }

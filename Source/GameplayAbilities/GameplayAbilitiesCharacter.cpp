@@ -123,3 +123,8 @@ void AGameplayAbilitiesCharacter::Landed(const FHitResult& Hit)
 
 	jumpCount = 0;
 }
+
+void AGameplayAbilitiesCharacter::FellOutOfWorld(const UDamageType& dmgType)
+{
+	OnCharacterDeath.Broadcast();
+}
