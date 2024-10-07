@@ -3,16 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
+#include "GameplayAbilitiesGameMode.h"
 #include "MainMenuGameMode.generated.h"
 
 class UUserWidget;
 
 /**
- * 
+ * Game Mode while in the main menu
  */
 UCLASS()
-class GAMEPLAYABILITIES_API AMainMenuGameMode : public AGameModeBase
+class GAMEPLAYABILITIES_API AMainMenuGameMode : public AGameplayAbilitiesGameMode
 {
 	GENERATED_BODY()
 
@@ -20,7 +20,7 @@ class GAMEPLAYABILITIES_API AMainMenuGameMode : public AGameModeBase
 
 protected:
 
-	virtual void BeginPlay() override;
+	virtual void StartPlay() override;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> MainMenuWidgetClass;

@@ -8,12 +8,16 @@
 
 AMainMenuGameMode::AMainMenuGameMode() : Super()
 {
+	PrimaryActorTick.bCanEverTick = false;
+
 	DefaultPawnClass = nullptr;
 	HUDClass = nullptr;
 }
 
-void AMainMenuGameMode::BeginPlay()
+void AMainMenuGameMode::StartPlay()
 {
+	Super::StartPlay();
+
 	if (IsValid(MainMenuWidgetClass))
 	{
 		// Create main menu widget

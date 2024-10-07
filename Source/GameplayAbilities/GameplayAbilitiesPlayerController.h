@@ -22,11 +22,6 @@ class GAMEPLAYABILITIES_API AGameplayAbilitiesPlayerController : public APlayerC
 	
 public:
 
-	UFUNCTION(BlueprintCallable)
-	float GetBestTime(int levelIndex);
-
-	void SetBestTime(int levelIndex, float time);
-
 	void SetInputToUIOnly(UUserWidget* FocusWidget);
 	void SetInputToGameOnly();
 
@@ -38,8 +33,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputMappingContext* MovementMappingContext;
-
-	UGameplayAbilitiesSaveGame* GameSave;
 
 	/***** ABILITIES *****/
 	UEnhancedInputLocalPlayerSubsystem* InputSubsystem;

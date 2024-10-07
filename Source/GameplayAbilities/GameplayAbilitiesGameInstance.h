@@ -6,6 +6,8 @@
 #include "Engine/GameInstance.h"
 #include "GameplayAbilitiesGameInstance.generated.h"
 
+class UGameplayAbilitiesSaveGame;
+
 /**
  * 
  */
@@ -18,5 +20,16 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	int CurrentLevelIndex;
+
+	virtual void Init() override;
+
+	void InitSaveData(int levelCount);
+
+	UFUNCTION(BlueprintCallable)
+	UGameplayAbilitiesSaveGame* GetGameSave() const { return GameSave; }
+
+protected:
+
+	UGameplayAbilitiesSaveGame* GameSave;
 	
 };

@@ -3,16 +3,41 @@
 
 #include "GameplayAbilitiesSaveGame.h"
 
+FCriticalSection CriticalSection;
+
+void UGameplayAbilitiesSaveGame::InitData(int levelCount)
+{
+	FScopeLock Lock(&CriticalSection);
+
+	if (LevelData.Num() == 0)
+	{
+		UE_LOG(LogTemp, Log, TEXT("levelCount: %d"), levelCount);
+
+		FLevelData newLevelData = FLevelData();
+		LevelData.Init(newLevelData, levelCount);
+	}
+}
+
 void UGameplayAbilitiesSaveGame::SetBestTime(int levelIndex, float newTime)
 {
-	// No data for this level
-	if (levelIndex > BestTimes.Num() - 1)
+	// Prevents Save Game object to be saved while we assign the data
+	FScopeLock Lock(&CriticalSection);
+
+	if (!LevelData.IsValidIndex(levelIndex))
 	{
-		BestTimes.SetNum(levelIndex + 1);
-		BestTimes[levelIndex] = newTime;
+		return;
 	}
-	else if (newTime < BestTimes[levelIndex] || BestTimes[levelIndex] == 0.0f)
+
+	UE_LOG(LogTemp, Log, TEXT("New time: %f"), newTime);
+	UE_LOG(LogTemp, Log, TEXT("Best time: %f"), LevelData[levelIndex].BestTime);
+
+	if (newTime < LevelData[levelIndex].BestTime || LevelData[levelIndex].BestTime == 0.0f)
 	{
-		BestTimes[levelIndex] = newTime;
+		LevelData[levelIndex].BestTime = newTime;
 	}
+}
+
+float UGameplayAbilitiesSaveGame::GetBestTime(int levelIndex)
+{
+	return LevelData[levelIndex].BestTime;
 }
