@@ -8,6 +8,7 @@
 #include "GameplayAbilitiesPlayerController.h"
 #include "GameplayAbilitiesGameInstance.h"
 #include "LevelEndZone.h"
+#include "GameplayAbilitiesSaveGame.h"
 
 AGameplayAbilitiesGameMode::AGameplayAbilitiesGameMode() : Super()
 {
@@ -23,7 +24,11 @@ void AGameplayAbilitiesGameMode::StartPlay()
 	if (IsValid(gameInstance))
 	{
 		GameInstance = Cast<UGameplayAbilitiesGameInstance>(gameInstance);
-		GameInstance->InitSaveData(Levels.Num());
+		if (IsValid(GameInstance))
+		{
+			UGameplayAbilitiesSaveGame* gameSave = GameInstance->GetGameSave();
+			gameSave->InitData(Levels.Num());
+		}
 	}
 }
 

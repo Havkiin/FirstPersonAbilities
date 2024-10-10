@@ -13,12 +13,12 @@ void UGameplayAbilitiesSaveGame::InitData(int levelCount)
 	{
 		UE_LOG(LogTemp, Log, TEXT("levelCount: %d"), levelCount);
 
-		FLevelData newLevelData = FLevelData();
+		FLevelPlayerData newLevelData = FLevelPlayerData();
 		LevelData.Init(newLevelData, levelCount);
 	}
 }
 
-void UGameplayAbilitiesSaveGame::SetBestTime(int levelIndex, float newTime)
+void UGameplayAbilitiesSaveGame::SetLevelData(int levelIndex, float newTime, bool noBlink, bool noTelekinesis, bool devFast)
 {
 	// Prevents Save Game object to be saved while we assign the data
 	FScopeLock Lock(&CriticalSection);
@@ -28,16 +28,46 @@ void UGameplayAbilitiesSaveGame::SetBestTime(int levelIndex, float newTime)
 		return;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("New time: %f"), newTime);
-	UE_LOG(LogTemp, Log, TEXT("Best time: %f"), LevelData[levelIndex].BestTime);
+	FLevelPlayerData levelData = LevelData[levelIndex];
 
-	if (newTime < LevelData[levelIndex].BestTime || LevelData[levelIndex].BestTime == 0.0f)
+	levelData.bIsCompleted = true;
+
+	if (newTime < levelData.BestTime || levelData.BestTime == 0.0f)
 	{
-		LevelData[levelIndex].BestTime = newTime;
+		levelData.BestTime = newTime;
 	}
+
+	if (!levelData.bNoBlink && noBlink)
+	{
+		levelData.bNoBlink = true;
+	}
+
+	if (!levelData.bNoTelekinesis && noTelekinesis)
+	{
+		levelData.bNoTelekinesis = true;
+	}
+
+	if (!levelData.bNoPowers && noBlink && noTelekinesis)
+	{
+		levelData.bNoPowers = true;
+	}
+
+	if (!levelData.bDevFast && devFast)
+	{
+		levelData.bDevFast = true;
+	}
+
+	LevelData[levelIndex] = levelData;
 }
 
-float UGameplayAbilitiesSaveGame::GetBestTime(int levelIndex)
+int UGameplayAbilitiesSaveGame::GetLastCompletedLevel() const
 {
-	return LevelData[levelIndex].BestTime;
+	int index = 0;
+
+	while (index < LevelData.Num() - 1 && LevelData[index].bIsCompleted)
+	{
+		index++;
+	}
+
+	return index;
 }

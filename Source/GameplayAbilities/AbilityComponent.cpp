@@ -39,12 +39,12 @@ void UAbilityComponent::BeginPlay()
 
 void UAbilityComponent::EnterAbility()
 {
-	OnEnterAbility.ExecuteIfBound(this);
+	OnEnterAbility.Broadcast(this);
 }
 
 void UAbilityComponent::LeaveAbility()
 {
-	OnLeaveAbility.ExecuteIfBound(this);
+	OnLeaveAbility.Broadcast(this);
 }
 
 UInputMappingContext* UAbilityComponent::GetMappingContext()

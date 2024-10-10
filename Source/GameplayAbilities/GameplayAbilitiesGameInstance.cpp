@@ -30,11 +30,3 @@ void UGameplayAbilitiesGameInstance::Init()
 		GameSave = projectGameSave;
 	}
 }
-
-void UGameplayAbilitiesGameInstance::InitSaveData(int levelCount)
-{
-	if (IsValid(GameSave))
-	{
-		GameSave->InitData(levelCount);
-	}
-}

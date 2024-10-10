@@ -25,7 +25,6 @@ void UTelekinesisComponent::BeginPlay()
 	EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &UTelekinesisComponent::ThrowItem);
 
 	// Notify the player controller
-	EnhancedInputComponent->BindAction(PickUpAction, ETriggerEvent::Started, this, &UAbilityComponent::EnterAbility);
 	EnhancedInputComponent->BindAction(PickUpAction, ETriggerEvent::Completed, this, &UAbilityComponent::LeaveAbility);
 
 }
@@ -69,6 +68,7 @@ void UTelekinesisComponent::PickUpItem(const FInputActionValue& Value)
 			MovedItem = Hit.GetActor();
 			DistanceToItem = MovedItem->GetActorLocation() - TraceStart;
 			bIsMovingItem = true;
+			EnterAbility();
 
 			UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(MovedItem->GetRootComponent());
 			if (IsValid(Component))
@@ -114,6 +114,10 @@ void UTelekinesisComponent::ReleaseItem()
 		if (IsValid(Component))
 		{
 			Component->SetEnableGravity(true);
+		}
+
+		if (IsValid(SpawnedComponent))
+		{
 			SpawnedComponent->DestroyInstance();
 		}
 	}

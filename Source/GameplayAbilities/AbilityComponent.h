@@ -9,7 +9,7 @@
 class UEnhancedInputComponent;
 class UInputMappingContext;
 
-DECLARE_DELEGATE_OneParam(FAbilityStateChangeDelegate, UAbilityComponent*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FAbilityStateChangeDelegate, UAbilityComponent*);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GAMEPLAYABILITIES_API UAbilityComponent : public UActorComponent

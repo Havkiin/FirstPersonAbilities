@@ -27,6 +27,8 @@ public:
 
 	void RegisterAbility(UAbilityComponent* Ability);
 
+	TArray<UAbilityComponent*> GetAbilities() const { return Abilities; }
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -35,6 +37,8 @@ protected:
 	UInputMappingContext* MovementMappingContext;
 
 	/***** ABILITIES *****/
+	TArray<UAbilityComponent*> Abilities;
+
 	UEnhancedInputLocalPlayerSubsystem* InputSubsystem;
 	TArray<UInputMappingContext*> AbilityMappingContexts;
 

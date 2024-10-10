@@ -12,12 +12,17 @@
 #include "GameplayAbilitiesGameInstance.h"
 #include "LevelEndZone.h"
 #include "GameplayAbilitiesSaveGame.h"
+#include "AbilityComponent.h"
+#include "BlinkComponent.h"
+#include "TelekinesisComponent.h"
 
 ALevelGameMode::ALevelGameMode() : Super()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	bIsLevelEnded = false;
+	bNoBlink = true;
+	bNoTelekinesis = true;
 }
 
 void ALevelGameMode::Tick(float DeltaTime)
@@ -41,7 +46,14 @@ void ALevelGameMode::StartPlay()
 	if (IsValid(playerController))
 	{
 		PlayerController = Cast<AGameplayAbilitiesPlayerController>(playerController);
-		PlayerController->SetInputToGameOnly();
+		if (IsValid(PlayerController))
+		{
+			PlayerController->SetInputToGameOnly();
+			for (UAbilityComponent* ability : PlayerController->GetAbilities())
+			{
+				ability->OnEnterAbility.AddUObject(this, &ALevelGameMode::UpdateAbilityUseData);
+			}
+		}
 
 		// Character setup
 		APawn* playerPawn = PlayerController->GetPawn();
@@ -80,7 +92,7 @@ void ALevelGameMode::EndLevel()
 			UGameplayAbilitiesSaveGame* gameSave = GameInstance->GetGameSave();
 
 			UE_LOG(LogTemp, Log, TEXT("levelIndex: %d"), levelIndex);
-			gameSave->SetBestTime(levelIndex, LevelTime);
+			gameSave->SetLevelData(levelIndex, LevelTime, bNoBlink, bNoTelekinesis, false);
 			UGameplayStatics::SaveGameToSlot(gameSave, "PlayerData", 0);
 
 			gameHUD->DisplayEndScore();
@@ -97,5 +109,26 @@ void ALevelGameMode::RestartLevel()
 	if (IsValid(PlayerController))
 	{
 		PlayerController->SetInputToGameOnly();
+	}
+}
+
+void ALevelGameMode::UpdateAbilityUseData(UAbilityComponent* Ability)
+{
+	if (bNoBlink)
+	{
+		UBlinkComponent* blink = Cast<UBlinkComponent>(Ability);
+		if (IsValid(blink))
+		{
+			bNoBlink = false;
+		}
+	}
+	
+	if (bNoTelekinesis)
+	{
+		UTelekinesisComponent* telekinesis = Cast<UTelekinesisComponent>(Ability);
+		if (IsValid(telekinesis))
+		{
+			bNoTelekinesis = false;
+		}
 	}
 }

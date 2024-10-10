@@ -23,8 +23,6 @@ public:
 
 	virtual void Init() override;
 
-	void InitSaveData(int levelCount);
-
 	UFUNCTION(BlueprintCallable)
 	UGameplayAbilitiesSaveGame* GetGameSave() const { return GameSave; }
 

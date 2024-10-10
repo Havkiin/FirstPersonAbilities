@@ -8,6 +8,7 @@
 
 class AGameplayAbilitiesPlayerController;
 class UGameplayAbilitiesGameInstance;
+class UAbilityComponent;
 
 /**
  * Game Mode while in a level (in-game)
@@ -47,5 +48,9 @@ protected:
 
 	float LevelTime;
 	bool bIsLevelEnded;
+	bool bNoBlink;
+	bool bNoTelekinesis;
+
+	void UpdateAbilityUseData(UAbilityComponent* Ability);
 	
 };

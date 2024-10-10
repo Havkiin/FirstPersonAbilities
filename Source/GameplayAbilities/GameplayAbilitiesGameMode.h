@@ -18,7 +18,7 @@ public:
 
 	AGameplayAbilitiesGameMode();
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FString> Levels;
 
 	UFUNCTION(BlueprintCallable)

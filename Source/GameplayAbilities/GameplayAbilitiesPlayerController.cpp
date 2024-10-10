@@ -25,13 +25,15 @@ void AGameplayAbilitiesPlayerController::BeginPlay()
 
 void AGameplayAbilitiesPlayerController::RegisterAbility(UAbilityComponent* Ability)
 {
+	Abilities.Add(Ability);
+
 	UInputMappingContext* MappingContext = Ability->GetMappingContext();
 	AbilityMappingContexts.Add(MappingContext);
 	InputSubsystem->AddMappingContext(MappingContext, 0);
 
 	// Bind delegate to remove controls for other abilities while an ability is in use
-	Ability->OnEnterAbility.BindUObject(this, &AGameplayAbilitiesPlayerController::RemoveOtherMappingContexts);
-	Ability->OnLeaveAbility.BindUObject(this, &AGameplayAbilitiesPlayerController::AddOtherMappingContexts);
+	Ability->OnEnterAbility.AddUObject(this, &AGameplayAbilitiesPlayerController::RemoveOtherMappingContexts);
+	Ability->OnLeaveAbility.AddUObject(this, &AGameplayAbilitiesPlayerController::AddOtherMappingContexts);
 }
 
 void AGameplayAbilitiesPlayerController::SetInputToUIOnly(UUserWidget* FocusWidget)
