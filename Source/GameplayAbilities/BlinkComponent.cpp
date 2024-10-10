@@ -27,8 +27,17 @@ void UBlinkComponent::BeginPlay()
 	EnhancedInputComponent->BindAction(BlinkAction, ETriggerEvent::Started, this, &UAbilityComponent::EnterAbility);
 	EnhancedInputComponent->BindAction(BlinkAction, ETriggerEvent::Completed, this, &UAbilityComponent::LeaveAbility);
 
-	SpawnedParticleComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, BlinkParticleSystem, FVector::ZeroVector, FRotator::ZeroRotator);
-	SpawnedParticleComponent->SetVisibility(false, true);
+	if (IsValid(GroundLocationParticleSystem))
+	{
+		GroundParticleComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, GroundLocationParticleSystem, FVector::ZeroVector, FRotator::ZeroRotator);
+		GroundParticleComponent->SetVisibility(false, true);
+	}
+
+	if (IsValid(BlinkLocationParticleSystem))
+	{
+		BlinkParticleComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, BlinkLocationParticleSystem, FVector::ZeroVector, FRotator::ZeroRotator);
+		BlinkParticleComponent->SetVisibility(false, true);
+	}
 
 }
 
@@ -60,9 +69,14 @@ void UBlinkComponent::PickBlinkLocation()
 	float characterRadius = ProjectCharacter->GetCapsuleRadius();
 	float characterHalfHeight = ProjectCharacter->GetCapsuleHalfHeight();
 
+	FVector GroundVFXLocation = FVector::ZeroVector;
+	FVector BlinkVFXLocation = FVector::ZeroVector;
+
 	// If we hit an actor, perform a raycast downwards
 	if (BlockingHit.GetActor())
 	{
+		bIsBlinkValid = true;
+
 		BlinkTraceStart = BlockingHit.Location;
 
 		FVector CapsuleOffset = BlinkTraceStart - BlockingTraceStart;
@@ -75,9 +89,21 @@ void UBlinkComponent::PickBlinkLocation()
 
 		bool bHitDown = World->LineTraceSingleByChannel(BlinkHit, BlinkTraceStart, BlinkTraceEnd, ECollisionChannel::ECC_Pawn, QueryParams);
 
+		BlinkLocation = BlinkTraceStart;
+		BlinkVFXLocation = BlinkTraceStart;
+
+		// We hit a wall or the ground
 		if (bHitDown)
 		{
-			BlinkLocation = BlinkHit.Location + FVector(0.0f, 0.0f, characterHalfHeight);
+			// We hit the ground or a lower section of a wall (lower than our character's half height)
+			float groundDistance = FVector::Distance(BlinkHit.Location, BlinkTraceStart);
+			if (groundDistance < characterHalfHeight)
+			{
+				BlinkLocation = BlinkHit.Location + FVector(0.0f, 0.0f, characterHalfHeight);
+				BlinkVFXLocation = BlinkHit.Location;
+			}
+
+			GroundVFXLocation = BlinkHit.Location;
 		}
 	}
 	// Otherwise, perform a box sweep starting from the actor location, to find blink locations along the way
@@ -98,25 +124,25 @@ void UBlinkComponent::PickBlinkLocation()
 
 			bool bHitDown = World->LineTraceSingleByChannel(BlinkHit, BlinkTraceStart, BlinkTraceEnd, ECollisionChannel::ECC_Pawn, QueryParams);
 
+			// We are going over a ledge
 			if (bHitDown)
 			{
+				bIsBlinkValid = true;
 				BlinkLocation = BlinkHit.Location + FVector(0.0f, 0.0f, characterHalfHeight);
+				GroundVFXLocation = BlinkHit.Location;
+				BlinkVFXLocation = BlinkHit.Location;
 			}
 		}
 	}
 
-	if (BlinkHit.bBlockingHit)
+	if (bIsBlinkValid)
 	{
-		bIsBlinkValid = true;
-		SpawnedParticleComponent->SetWorldLocation(BlinkLocation - FVector(0.0f, 0.0f, characterHalfHeight));
-	}
-	else
-	{
-		bIsBlinkValid = false;
+		GroundParticleComponent->SetWorldLocation(GroundVFXLocation);
+		BlinkParticleComponent->SetWorldLocation(BlinkVFXLocation);
 	}
 
-	SpawnedParticleComponent->SetVisibility(bIsBlinkValid, true);
-
+	GroundParticleComponent->SetVisibility(bIsBlinkValid, true);
+	BlinkParticleComponent->SetVisibility(bIsBlinkValid, true);
 }
 
 void UBlinkComponent::Blink()
@@ -127,8 +153,9 @@ void UBlinkComponent::Blink()
 	APawn* PawnOwner = Cast<APawn>(GetOwner());
 	if (IsValid(PawnOwner))
 	{
-		PawnOwner->SetActorLocation(BlinkLocation);
+		PawnOwner->SetActorLocation(BlinkLocation, false, nullptr, ETeleportType::ResetPhysics);
 		bIsBlinkValid = false;
-		SpawnedParticleComponent->SetVisibility(false, true);
+		GroundParticleComponent->SetVisibility(false, true);
+		BlinkParticleComponent->SetVisibility(false, true);
 	}
 }

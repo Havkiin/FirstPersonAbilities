@@ -18,11 +18,17 @@ public:
 
 	AGameplayAbilitiesGameMode();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, Category = Levels)
+	FString MainMenuLevel;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Levels)
 	TArray<FString> Levels;
 
 	UFUNCTION(BlueprintCallable)
-	UGameplayAbilitiesGameInstance* GetGameInstance() const;
+	UGameplayAbilitiesGameInstance* GetGameInstance() const { return GameInstance; }
+
+	UFUNCTION(BlueprintCallable)
+	void LoadMainMenu();
 
 	UFUNCTION (BlueprintCallable)
 	void LoadLevel(int levelIndex);

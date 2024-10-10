@@ -44,38 +44,54 @@ void UTelekinesisComponent::PickUpItem(const FInputActionValue& Value)
 	if (!IsValid(ProjectCharacter))
 		return;
 
+	FHitResult Hit;
+
+	FVector TraceStart = PawnOwner->GetActorLocation() + ProjectCharacter->GetPOV_Origin();
+	FVector TraceEnd = PawnOwner->GetActorLocation() + ProjectCharacter->GetPOV_Origin() + PawnOwner->GetControlRotation().Vector() * PickUpRange;
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(PawnOwner);
+
+	GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Pawn, QueryParams);
+
+	// We are moving an item
 	if (bIsMovingItem)
 	{
 		FVector NewLocation = PawnOwner->GetActorLocation() + ProjectCharacter->GetPOV_Origin() + PawnOwner->GetControlRotation().Vector() * DistanceToItem.Length();
 
-		MovedItem->SetActorLocation(NewLocation);
-		SpawnedComponent->SetWorldLocation(NewLocation);
-	}
-	else
-	{
-		FHitResult Hit;
+		MovedItem->SetActorLocation(NewLocation, true, nullptr, ETeleportType::ResetPhysics);
 
-		FVector TraceStart = PawnOwner->GetActorLocation() + ProjectCharacter->GetPOV_Origin();
-		FVector TraceEnd = PawnOwner->GetActorLocation() + ProjectCharacter->GetPOV_Origin() + PawnOwner->GetControlRotation().Vector() * PickUpRange;
+		FVector newItemLocation = MovedItem->GetActorLocation();
+		SpawnedComponent->SetWorldLocation(newItemLocation);
 
-		FCollisionQueryParams QueryParams;
-		QueryParams.AddIgnoredActor(PawnOwner);
+		// If the moved item got stuck against something or we lost line of sight, release it
+		FVector toItem = newItemLocation - TraceStart;
+		FVector toAim = TraceEnd - TraceStart;
+		toItem.Normalize();
+		toAim.Normalize();
 
-		GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Pawn, QueryParams);
+		float dot = toItem.Dot(toAim);
+		float angleToItem = FMath::Acos(dot);
+		angleToItem = FMath::RadiansToDegrees(angleToItem);
 
-		if (Hit.bBlockingHit && Hit.GetActor()->GetRootComponent()->IsSimulatingPhysics())
+		if (angleToItem > DropAngle)
 		{
-			MovedItem = Hit.GetActor();
-			DistanceToItem = MovedItem->GetActorLocation() - TraceStart;
-			bIsMovingItem = true;
-			EnterAbility();
+			ReleaseItem();
+		}
+	}
+	// We are looking for an item to move
+	else if (Hit.bBlockingHit && Hit.GetActor()->GetRootComponent()->IsSimulatingPhysics())
+	{
+		MovedItem = Hit.GetActor();
+		DistanceToItem = MovedItem->GetActorLocation() - TraceStart;
+		bIsMovingItem = true;
+		EnterAbility();
 
-			UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(MovedItem->GetRootComponent());
-			if (IsValid(Component))
-			{
-				Component->SetEnableGravity(false);	
-				SpawnedComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, MoveParticleSystem, MovedItem->GetActorLocation(), MovedItem->GetActorRotation());
-			}
+		UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(MovedItem->GetRootComponent());
+		if (IsValid(Component))
+		{
+			Component->SetEnableGravity(false);	
+			SpawnedComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, MoveParticleSystem, MovedItem->GetActorLocation(), MovedItem->GetActorRotation());
 		}
 	}
 }

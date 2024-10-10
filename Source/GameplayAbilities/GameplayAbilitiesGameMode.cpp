@@ -13,6 +13,8 @@
 AGameplayAbilitiesGameMode::AGameplayAbilitiesGameMode() : Super()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	MainMenuLevel = "MainMenu";
 }
 
 void AGameplayAbilitiesGameMode::StartPlay()
@@ -32,6 +34,15 @@ void AGameplayAbilitiesGameMode::StartPlay()
 	}
 }
 
+void AGameplayAbilitiesGameMode::LoadMainMenu()
+{
+	if (!MainMenuLevel.IsEmpty())
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), FName(MainMenuLevel));
+		GameInstance->CurrentLevelIndex = -1;
+	}
+}
+
 void AGameplayAbilitiesGameMode::LoadLevel(int levelIndex)
 {
 	if (Levels.IsValidIndex(levelIndex))
@@ -40,9 +51,4 @@ void AGameplayAbilitiesGameMode::LoadLevel(int levelIndex)
 		UGameplayStatics::OpenLevel(GetWorld(), FName(LevelToLoad));
 		GameInstance->CurrentLevelIndex = levelIndex;
 	}
-}
-
-UGameplayAbilitiesGameInstance* AGameplayAbilitiesGameMode::GetGameInstance() const
-{
-	return GameInstance;
 }

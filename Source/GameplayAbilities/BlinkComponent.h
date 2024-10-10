@@ -26,9 +26,13 @@ public:
 	UInputAction* BlinkAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
-	UNiagaraSystem* BlinkParticleSystem;
+	UNiagaraSystem* GroundLocationParticleSystem;
 
-	UNiagaraComponent* SpawnedParticleComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
+	UNiagaraSystem* BlinkLocationParticleSystem;
+
+	UNiagaraComponent* GroundParticleComponent;
+	UNiagaraComponent* BlinkParticleComponent;
 
 protected:
 	virtual void BeginPlay() override;

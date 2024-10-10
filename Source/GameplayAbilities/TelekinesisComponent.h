@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Data)
 	float ThrowForce;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Data)
+	float DropAngle;
+
 	/** Telekinesis Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputAction* PickUpAction;
