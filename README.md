@@ -1,17 +1,15 @@
-# First Person Abilities
+# FPS Puzzle Game
 
-This project encapsulates several gameplay abilities for a FPS character in Unreal Engine 5.
+This project is a FPS/Puzzle game, where you try to complete levels as fast as possible, using two abilties: [Telekinesis](Source/GameplayAbilities/TelekinesisComponent.cpp) and a [Blink](Source/GameplayAbilities/BlinkComponent.cpp).
 
-The abilities are encapsulated inside components, which can be added/removed from the character easily.
+## Abilities
 
-## Telekinesis
+The abilities are encapsulated inside components, which can be added/removed from the character easily. [Ability Component](Source/GameplayAbilities/AbilityComponent.cpp) features a light version of Unreal's Gameplay Ability System, allowing delegates to be attached to be attached upon entering and leaving an ability. They work hand in hand with the [Player Controller](Source/GameplayAbilities/GameplayAbilitiesPlayerController.cpp) to ensure only one can be used at any time.
 
-The [Telekinesis Component](Source/GameplayAbilities/TelekinesisComponent.cpp) is a simple telekinesis ability, which allows you to pick up and move around blocks, and throw them in a direction.
+## Menus
 
-Press Left Click to move the object around, and Right Click to throw it.
+The game features a main menu and a level selection menu, which are automatically populated with the levels created.
 
-## Blink
+## Data
 
-The [Blink Component](Source/GameplayAbilities/BlinkComponent.cpp) is a Blink ability, similar to the one from _Dishonored_, which teleports you to a set location.
-
-Press and hold Right Click to pick a teleport location, and release to teleport.
+The game keeps track of the time a player takes to finish a level, as well as if the level was completed without Blink, Telekinesis, or either of the abilities in a [Save Game](Source/GameplayAbilities/GameplayAbilitiesSaveGame.h) file. This provides an extra challenge in trying to find the way to do it.
