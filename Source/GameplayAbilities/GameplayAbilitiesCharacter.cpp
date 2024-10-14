@@ -25,6 +25,7 @@ AGameplayAbilitiesCharacter::AGameplayAbilitiesCharacter()
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(CapsuleRadius, CapsuleHalfHeight);
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AGameplayAbilitiesCharacter::OnHit);
 		
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
@@ -51,6 +52,18 @@ AGameplayAbilitiesCharacter::AGameplayAbilitiesCharacter()
 void AGameplayAbilitiesCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AGameplayAbilitiesCharacter::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+{
+	// Avoid unwanted telekinesis behaviour (moving an item while standing on top of it, etc.)
+	if (IsValid(TelekinesisComponent))
+	{
+		if (IsValid(OtherActor) && OtherActor == TelekinesisComponent->GetMovedItem())
+		{
+			TelekinesisComponent->ReleaseItem();
+		}
+	}
 }
 
 void AGameplayAbilitiesCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

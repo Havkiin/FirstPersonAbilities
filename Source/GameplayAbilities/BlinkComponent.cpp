@@ -13,6 +13,8 @@ UBlinkComponent::UBlinkComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	bIsBlinkValid = false;
+	bIsBlinking = false;
+	BlinkCount = 0;
 }
 
 
@@ -26,7 +28,6 @@ void UBlinkComponent::BeginPlay()
 
 	// Notify the player controller
 	EnhancedInputComponent->BindAction(BlinkAction, ETriggerEvent::Started, this, &UAbilityComponent::EnterAbility);
-	//EnhancedInputComponent->BindAction(BlinkAction, ETriggerEvent::Completed, this, &UAbilityComponent::LeaveAbility);
 
 	if (IsValid(GroundLocationParticleSystem))
 	{
@@ -77,6 +78,14 @@ void UBlinkComponent::PickBlinkLocation()
 
 	AGameplayAbilitiesCharacter* ProjectCharacter = Cast<AGameplayAbilitiesCharacter>(PawnOwner);
 	if (!IsValid(ProjectCharacter))
+		return;
+
+	UCharacterMovementComponent* CharacterMovement = ProjectCharacter->GetCharacterMovement();
+	if (!IsValid(CharacterMovement))
+		return;
+		
+	// You can only blink once mid-air
+	if (CharacterMovement->IsFalling() && BlinkCount > 0)
 		return;
 
 	FHitResult BlockingHit;
@@ -181,8 +190,6 @@ void UBlinkComponent::Blink()
 	APawn* PawnOwner = Cast<APawn>(GetOwner());
 	if (IsValid(PawnOwner))
 	{
-		//PawnOwner->SetActorLocation(BlinkLocation, false, nullptr, ETeleportType::ResetPhysics);
-
 		ACharacter* Character = Cast<ACharacter>(PawnOwner);
 		if (IsValid(Character))
 		{
@@ -194,8 +201,14 @@ void UBlinkComponent::Blink()
 
 			bIsBlinkValid = false;
 			bIsBlinking = true;
+			BlinkCount++;
 			GroundParticleComponent->SetVisibility(false, true);
 			BlinkParticleComponent->SetVisibility(false, true);
 		}
 	}
+}
+
+void UBlinkComponent::ResetBlinkCount()
+{
+	BlinkCount = 0;
 }

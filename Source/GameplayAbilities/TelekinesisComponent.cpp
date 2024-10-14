@@ -3,6 +3,7 @@
 
 #include "TelekinesisComponent.h"
 #include "GameplayAbilitiesCharacter.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values for this component's properties
 UTelekinesisComponent::UTelekinesisComponent()
@@ -119,6 +120,33 @@ void UTelekinesisComponent::PickUpItem(const FInputActionValue& Value)
 	else if (Hit.bBlockingHit && Hit.GetActor()->GetRootComponent()->IsSimulatingPhysics())
 	{
 		MovedItem = Hit.GetActor();
+		
+		TArray<FHitResult> HitResults;
+		FVector StartLocation = PawnOwner->GetActorLocation();
+		FVector EndLocation = StartLocation;
+
+		FCollisionShape CollisionShape;
+		float capsuleHalfHeight = ProjectCharacter->GetCapsuleHalfHeight() * 1.05f;
+		float capsuleRadius = ProjectCharacter->GetCapsuleRadius();
+		CollisionShape.SetCapsule(capsuleRadius, capsuleHalfHeight);
+
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(PawnOwner);
+
+		bool bHit = GetWorld()->SweepMultiByChannel(HitResults, StartLocation, EndLocation, FQuat::Identity, ECC_PhysicsBody, CollisionShape, CollisionParams);
+
+		// Do not enter ability if we are colliding with the item we want to move (on top of it, etc.)
+		if (bHit)
+		{
+			for (FHitResult hitResult : HitResults)
+			{
+				if (hitResult.GetActor() == MovedItem)
+				{
+					return;
+				}
+			}
+		}
+
 		DistanceToItem = MovedItem->GetActorLocation() - TraceStart;
 		bIsMovingItem = true;
 		EnterAbility();

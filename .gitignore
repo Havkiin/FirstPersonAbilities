@@ -6,6 +6,7 @@ DerivedDataCache/
 
 # Ignore Visual Studio files
 .vs/
+.vsconfig
 *.sln
 *.vcxproj*
 *.user

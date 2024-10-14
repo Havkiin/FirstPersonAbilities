@@ -24,6 +24,9 @@ class AGameplayAbilitiesCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+public:
+	AGameplayAbilitiesCharacter();
+
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Mesh, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Mesh1P;
@@ -45,13 +48,6 @@ class AGameplayAbilitiesCharacter : public ACharacter
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
-
-	int jumpCount;
-
-	FVector POV_Origin;
-
-public:
-	AGameplayAbilitiesCharacter();
 
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -82,6 +78,9 @@ public:
 protected:
 	virtual void BeginPlay();
 
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
@@ -90,7 +89,11 @@ protected:
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
-	// End of APawn interface
+	// End of APawn interface	 
+
+	int jumpCount;
+
+	FVector POV_Origin;
 
 	float CapsuleRadius;
 	float CapsuleHalfHeight;

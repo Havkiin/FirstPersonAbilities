@@ -37,6 +37,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
 	UNiagaraSystem* BlinkLocationParticleSystem;
 
+	UFUNCTION(BlueprintCallable)
+	void ResetBlinkCount();
+
 	UNiagaraComponent* GroundParticleComponent;
 	UNiagaraComponent* BlinkParticleComponent;
 
@@ -45,11 +48,11 @@ protected:
 
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	bool bIsBlinkValid;
-	FVector BlinkLocation;
-
 	void PickBlinkLocation();
 	void Blink();
 
+	bool bIsBlinkValid;
 	bool bIsBlinking;
+	int BlinkCount;
+	FVector BlinkLocation;
 };

@@ -51,8 +51,9 @@ public:
 	bool bIsMovingItem;
 	bool bIsHoldingKey;
 
-	AActor* MovedItem;
-	FVector DistanceToItem;
+	void ReleaseItem();
+
+	AActor* GetMovedItem() const { return MovedItem; }
 
 protected:
 	// Called when the game starts
@@ -63,6 +64,8 @@ protected:
 	void ThrowItem(const FInputActionValue& Value);
 
 	void ReleaseKey(const FInputActionValue& Value);
-	void ReleaseItem();
+
+	AActor* MovedItem;
+	FVector DistanceToItem;
 
 };
