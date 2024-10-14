@@ -38,6 +38,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RestartLevel();
 
+	UFUNCTION(BlueprintCallable)
+	bool IsNoBlink() const { return bNoBlink; }
+
+	UFUNCTION(BlueprintCallable)
+	bool IsNoTelekinesis() const { return bNoTelekinesis; }
+
 	virtual void StartPlay() override;
 
 protected:

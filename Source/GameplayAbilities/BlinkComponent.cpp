@@ -6,6 +6,7 @@
 #include "GameplayAbilitiesCharacter.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UBlinkComponent::UBlinkComponent()
 {
@@ -25,7 +26,7 @@ void UBlinkComponent::BeginPlay()
 
 	// Notify the player controller
 	EnhancedInputComponent->BindAction(BlinkAction, ETriggerEvent::Started, this, &UAbilityComponent::EnterAbility);
-	EnhancedInputComponent->BindAction(BlinkAction, ETriggerEvent::Completed, this, &UAbilityComponent::LeaveAbility);
+	//EnhancedInputComponent->BindAction(BlinkAction, ETriggerEvent::Completed, this, &UAbilityComponent::LeaveAbility);
 
 	if (IsValid(GroundLocationParticleSystem))
 	{
@@ -41,8 +42,35 @@ void UBlinkComponent::BeginPlay()
 
 }
 
+void UBlinkComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (bIsBlinking)
+	{
+		ACharacter* Character = Cast<ACharacter>(GetOwner());
+		if (IsValid(Character))
+		{
+			float distanceToDestination = FVector::Distance(Character->GetActorLocation(), BlinkLocation);
+			if (distanceToDestination < ArriveThreshold)
+			{
+				Character->GetCharacterMovement()->StopMovementImmediately();
+				Character->SetActorLocation(BlinkLocation, false, nullptr, ETeleportType::ResetPhysics);
+
+				bIsBlinking = false;
+				Character->bSimGravityDisabled = false;
+				Character->SetActorEnableCollision(true);
+				LeaveAbility();
+			}
+		}
+	}
+}
+
 void UBlinkComponent::PickBlinkLocation()
 {
+	if (bIsBlinking)
+		return;
+
 	APawn* PawnOwner = Cast<APawn>(GetOwner());
 	if (!IsValid(PawnOwner))
 		return;
@@ -153,9 +181,21 @@ void UBlinkComponent::Blink()
 	APawn* PawnOwner = Cast<APawn>(GetOwner());
 	if (IsValid(PawnOwner))
 	{
-		PawnOwner->SetActorLocation(BlinkLocation, false, nullptr, ETeleportType::ResetPhysics);
-		bIsBlinkValid = false;
-		GroundParticleComponent->SetVisibility(false, true);
-		BlinkParticleComponent->SetVisibility(false, true);
+		//PawnOwner->SetActorLocation(BlinkLocation, false, nullptr, ETeleportType::ResetPhysics);
+
+		ACharacter* Character = Cast<ACharacter>(PawnOwner);
+		if (IsValid(Character))
+		{
+			FVector direction = BlinkLocation - Character->GetActorLocation();
+			direction.Normalize();
+			Character->LaunchCharacter(direction * LaunchForce, true, true);
+			Character->bSimGravityDisabled = true;
+			Character->SetActorEnableCollision(false);
+
+			bIsBlinkValid = false;
+			bIsBlinking = true;
+			GroundParticleComponent->SetVisibility(false, true);
+			BlinkParticleComponent->SetVisibility(false, true);
+		}
 	}
 }

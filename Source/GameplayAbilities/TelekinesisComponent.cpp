@@ -27,6 +27,12 @@ void UTelekinesisComponent::BeginPlay()
 	// Notify the player controller
 	EnhancedInputComponent->BindAction(PickUpAction, ETriggerEvent::Completed, this, &UAbilityComponent::LeaveAbility);
 
+	if (IsValid(MoveParticleSystem))
+	{
+		SpawnedVFXComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, MoveParticleSystem, FVector::ZeroVector, FRotator::ZeroRotator);
+		SpawnedVFXComponent->SetVisibility(false, true);
+	}
+
 }
 
 void UTelekinesisComponent::PickUpItem(const FInputActionValue& Value)
@@ -58,11 +64,41 @@ void UTelekinesisComponent::PickUpItem(const FInputActionValue& Value)
 	if (bIsMovingItem)
 	{
 		FVector NewLocation = PawnOwner->GetActorLocation() + ProjectCharacter->GetPOV_Origin() + PawnOwner->GetControlRotation().Vector() * DistanceToItem.Length();
+		FVector MovedItemLocation = MovedItem->GetActorLocation();
 
-		MovedItem->SetActorLocation(NewLocation, true, nullptr, ETeleportType::ResetPhysics);
+		UPrimitiveComponent* MovedItemComponent = Cast<UPrimitiveComponent>(MovedItem->GetRootComponent());
+		FVector MoveDirection = NewLocation - MovedItemLocation;
+		MoveDirection.Normalize();
+
+		// Smooth out movement
+		float distanceToDestination = FVector::Distance(MovedItemLocation, NewLocation);
+		float speedModifier = FMath::Clamp(distanceToDestination / DestinationReachThreshold, 0.0f, 1.0f);
+
+		FHitResult HitResult;
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(MovedItem);
+
+		// Stop if we would move through a wall
+		bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, MovedItemLocation, NewLocation, ECC_Visibility, CollisionParams);
+		if (bHit && Hit.GetActor())
+		{
+			speedModifier = 0.0f;
+		}
+
+		// Stop if we are close enough to the aimed direction or we would go through an object
+		if (distanceToDestination < 5.0f)
+		{
+			speedModifier = 0.0f;
+		}
+
+		// Move the item and its VFX
+		MoveDirection *= (MoveSpeed * speedModifier);
+
+		MovedItemComponent->SetPhysicsLinearVelocity(MoveDirection);
+		MovedItemComponent->SetAllPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
 
 		FVector newItemLocation = MovedItem->GetActorLocation();
-		SpawnedComponent->SetWorldLocation(newItemLocation);
+		SpawnedVFXComponent->SetWorldLocation(newItemLocation);
 
 		// If the moved item got stuck against something or we lost line of sight, release it
 		FVector toItem = newItemLocation - TraceStart;
@@ -91,7 +127,8 @@ void UTelekinesisComponent::PickUpItem(const FInputActionValue& Value)
 		if (IsValid(Component))
 		{
 			Component->SetEnableGravity(false);	
-			SpawnedComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, MoveParticleSystem, MovedItem->GetActorLocation(), MovedItem->GetActorRotation());
+			SpawnedVFXComponent->SetVisibility(true, true);
+			SpawnedVFXComponent->ReinitializeSystem();
 		}
 	}
 }
@@ -117,7 +154,11 @@ void UTelekinesisComponent::ThrowItem(const FInputActionValue& Value)
 void UTelekinesisComponent::ReleaseKey(const FInputActionValue& Value)
 {
 	bIsHoldingKey = false;
-	ReleaseItem();
+
+	if (bIsMovingItem)
+	{
+		ReleaseItem();
+	}
 }
 
 void UTelekinesisComponent::ReleaseItem()
@@ -130,11 +171,12 @@ void UTelekinesisComponent::ReleaseItem()
 		if (IsValid(Component))
 		{
 			Component->SetEnableGravity(true);
+			Component->SetAllPhysicsLinearVelocity(FVector::ZeroVector);
 		}
 
-		if (IsValid(SpawnedComponent))
+		if (IsValid(SpawnedVFXComponent))
 		{
-			SpawnedComponent->DestroyInstance();
+			SpawnedVFXComponent->SetVisibility(false, true);
 		}
 	}
 }

@@ -11,6 +11,7 @@
 #include "Engine/LocalPlayer.h"
 #include "TelekinesisComponent.h"
 #include "BlinkComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -44,6 +45,7 @@ AGameplayAbilitiesCharacter::AGameplayAbilitiesCharacter()
 	TelekinesisComponent = CreateDefaultSubobject<UTelekinesisComponent>(TEXT("TelekinesisComponent"));
 
 	jumpCount = 0;
+	PushForceOnGround = GetCharacterMovement()->PushForceFactor;
 }
 
 void AGameplayAbilitiesCharacter::BeginPlay()
@@ -115,6 +117,8 @@ void AGameplayAbilitiesCharacter::OnJumped_Implementation()
 	{
 		jumpCount++;
 	}
+
+	GetCharacterMovement()->PushForceFactor = PushForceInAir;
 }
 
 void AGameplayAbilitiesCharacter::Landed(const FHitResult& Hit)
@@ -122,6 +126,7 @@ void AGameplayAbilitiesCharacter::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 
 	jumpCount = 0;
+	GetCharacterMovement()->PushForceFactor = PushForceOnGround;
 }
 
 void AGameplayAbilitiesCharacter::FellOutOfWorld(const UDamageType& dmgType)

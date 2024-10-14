@@ -21,6 +21,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Data)
 	float BlinkRange;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Data)
+	float LaunchForce;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Data)
+	float ArriveThreshold;
+
 	/** Telekinesis Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	UInputAction* BlinkAction;
@@ -37,9 +43,13 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 	bool bIsBlinkValid;
 	FVector BlinkLocation;
 
 	void PickBlinkLocation();
 	void Blink();
+
+	bool bIsBlinking;
 };

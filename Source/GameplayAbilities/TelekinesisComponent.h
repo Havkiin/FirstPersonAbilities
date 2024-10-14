@@ -25,6 +25,12 @@ public:
 	float PickUpRange;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Data)
+	float MoveSpeed;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Data)
+	float DestinationReachThreshold;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Data)
 	float ThrowForce;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Data)
@@ -40,7 +46,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
 	UNiagaraSystem* MoveParticleSystem;
 
-	UNiagaraComponent* SpawnedComponent;
+	UNiagaraComponent* SpawnedVFXComponent;
 
 	bool bIsMovingItem;
 	bool bIsHoldingKey;

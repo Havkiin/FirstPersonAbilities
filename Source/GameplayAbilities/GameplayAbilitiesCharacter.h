@@ -46,10 +46,6 @@ class AGameplayAbilitiesCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
 
-	/** Telekinesis Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputAction* TelekinesisAction;
-
 	int jumpCount;
 
 	FVector POV_Origin;
@@ -60,6 +56,9 @@ public:
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Physics)
+	float PushForceInAir;
 
 	FOnCharacterDeath OnCharacterDeath;
 
@@ -95,5 +94,7 @@ protected:
 
 	float CapsuleRadius;
 	float CapsuleHalfHeight;
+
+	float PushForceOnGround;
 };
 
