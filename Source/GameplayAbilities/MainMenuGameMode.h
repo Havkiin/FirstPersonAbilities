@@ -25,6 +25,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> MainMenuWidgetClass;
 
-	UUserWidget* MainMenuWidget;
+	TObjectPtr<UUserWidget> MainMenuWidget;
 	
 };

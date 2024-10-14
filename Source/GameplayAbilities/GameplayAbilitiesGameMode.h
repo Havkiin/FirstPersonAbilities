@@ -37,6 +37,6 @@ public:
 
 protected:
 
-	UGameplayAbilitiesGameInstance* GameInstance;
+	TObjectPtr<UGameplayAbilitiesGameInstance> GameInstance;
 
 };

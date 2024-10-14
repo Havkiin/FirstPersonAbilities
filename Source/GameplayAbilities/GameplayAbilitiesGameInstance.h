@@ -28,6 +28,6 @@ public:
 
 protected:
 
-	UGameplayAbilitiesSaveGame* GameSave;
+	TObjectPtr<UGameplayAbilitiesSaveGame> GameSave;
 	
 };

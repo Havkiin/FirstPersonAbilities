@@ -26,14 +26,14 @@ public:
 	virtual void EnterAbility();
 	virtual void LeaveAbility();
 
-	UInputMappingContext* GetMappingContext();
+	TObjectPtr<UInputMappingContext> GetMappingContext() const { return MappingContext; }
 
 protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UInputMappingContext* MappingContext;
+	TObjectPtr<UInputMappingContext> MappingContext;
 
-	UEnhancedInputComponent* EnhancedInputComponent;
+	TObjectPtr<UEnhancedInputComponent> EnhancedInputComponent;
 
 };

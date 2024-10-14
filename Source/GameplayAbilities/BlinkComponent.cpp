@@ -109,6 +109,8 @@ void UBlinkComponent::PickBlinkLocation()
 	FVector GroundVFXLocation = FVector::ZeroVector;
 	FVector BlinkVFXLocation = FVector::ZeroVector;
 
+	bIsBlinkValid = false;
+
 	// If we hit an actor, perform a raycast downwards
 	if (BlockingHit.GetActor())
 	{

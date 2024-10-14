@@ -50,7 +50,7 @@ protected:
 
 	virtual void Tick(float DeltaTime) override;
 
-	AGameplayAbilitiesPlayerController* PlayerController;
+	TObjectPtr<AGameplayAbilitiesPlayerController> PlayerController;
 
 	float LevelTime;
 	bool bIsLevelEnded;

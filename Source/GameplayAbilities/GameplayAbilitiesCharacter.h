@@ -7,13 +7,15 @@
 #include "Logging/LogMacros.h"
 #include "GameplayAbilitiesCharacter.generated.h"
 
-class UInputComponent;
-class USkeletalMeshComponent;
-class UCameraComponent;
-class UInputAction;
-class UInputMappingContext;
-class UTelekinesisComponent;
 class UBlinkComponent;
+class UCameraComponent;
+class UDamageType;
+class UInputAction;
+class UInputComponent;
+class UInputMappingContext;
+class USkeletalMeshComponent;
+class UTelekinesisComponent;
+
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -29,29 +31,29 @@ public:
 
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Mesh, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* Mesh1P;
+	TObjectPtr<USkeletalMeshComponent> Mesh1P;
 
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FirstPersonCameraComponent;
+	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ability, meta = (AllowPrivateAccess = "true"))
-	UTelekinesisComponent* TelekinesisComponent;
+	TObjectPtr<UTelekinesisComponent> TelekinesisComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Ability, meta = (AllowPrivateAccess = "true"))
-	UBlinkComponent* BlinkComponent;
+	TObjectPtr<UBlinkComponent> BlinkComponent;
 
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputAction* JumpAction;
+	TObjectPtr<UInputAction> JumpAction;
 
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputAction* MoveAction;
+	TObjectPtr<UInputAction> MoveAction;
 
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;
+	TObjectPtr<UInputAction> LookAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Physics)
 	float PushForceInAir;
@@ -67,9 +69,9 @@ public:
 	virtual void FellOutOfWorld(const class UDamageType& dmgType) override;
 
 	/** Returns Mesh1P subobject **/
-	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
+	TObjectPtr<USkeletalMeshComponent> GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
-	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+	TObjectPtr<UCameraComponent> GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
 	float GetCapsuleRadius() const { return CapsuleRadius; }
 	float GetCapsuleHalfHeight() const { return CapsuleHalfHeight; }

@@ -34,12 +34,12 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UInputMappingContext* MovementMappingContext;
+	TObjectPtr<UInputMappingContext> MovementMappingContext;
 
 	/***** ABILITIES *****/
 	TArray<UAbilityComponent*> Abilities;
 
-	UEnhancedInputLocalPlayerSubsystem* InputSubsystem;
+	TObjectPtr<UEnhancedInputLocalPlayerSubsystem> InputSubsystem;
 	TArray<UInputMappingContext*> AbilityMappingContexts;
 
 	void AddOtherMappingContexts(UAbilityComponent* Ability);

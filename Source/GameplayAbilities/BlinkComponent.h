@@ -29,19 +29,19 @@ public:
 
 	/** Telekinesis Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UInputAction* BlinkAction;
+	TObjectPtr<UInputAction> BlinkAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
-	UNiagaraSystem* GroundLocationParticleSystem;
+	TObjectPtr<UNiagaraSystem> GroundLocationParticleSystem;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
-	UNiagaraSystem* BlinkLocationParticleSystem;
+	TObjectPtr<UNiagaraSystem> BlinkLocationParticleSystem;
 
 	UFUNCTION(BlueprintCallable)
 	void ResetBlinkCount();
 
-	UNiagaraComponent* GroundParticleComponent;
-	UNiagaraComponent* BlinkParticleComponent;
+	TObjectPtr<UNiagaraComponent> GroundParticleComponent;
+	TObjectPtr<UNiagaraComponent> BlinkParticleComponent;
 
 protected:
 	virtual void BeginPlay() override;

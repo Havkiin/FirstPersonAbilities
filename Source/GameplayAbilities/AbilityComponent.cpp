@@ -46,8 +46,3 @@ void UAbilityComponent::LeaveAbility()
 {
 	OnLeaveAbility.Broadcast(this);
 }
-
-UInputMappingContext* UAbilityComponent::GetMappingContext()
-{
-	return MappingContext;
-}

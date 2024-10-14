@@ -38,22 +38,22 @@ public:
 
 	/** Telekinesis Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UInputAction* PickUpAction;
+	TObjectPtr<UInputAction> PickUpAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UInputAction* ThrowAction;
+	TObjectPtr<UInputAction> ThrowAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = VFX)
-	UNiagaraSystem* MoveParticleSystem;
+	TObjectPtr<UNiagaraSystem> MoveParticleSystem;
 
-	UNiagaraComponent* SpawnedVFXComponent;
+	TObjectPtr<UNiagaraComponent> SpawnedVFXComponent;
 
 	bool bIsMovingItem;
 	bool bIsHoldingKey;
 
 	void ReleaseItem();
 
-	AActor* GetMovedItem() const { return MovedItem; }
+	TObjectPtr<AActor> GetMovedItem() const { return MovedItem; }
 
 protected:
 	// Called when the game starts
@@ -65,7 +65,7 @@ protected:
 
 	void ReleaseKey(const FInputActionValue& Value);
 
-	AActor* MovedItem;
+	TObjectPtr<AActor> MovedItem;
 	FVector DistanceToItem;
 
 };

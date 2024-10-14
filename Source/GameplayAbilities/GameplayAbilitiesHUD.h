@@ -19,10 +19,10 @@ class GAMEPLAYABILITIES_API AGameplayAbilitiesHUD : public AHUD
 public:
 
 	UPROPERTY(EditAnywhere, Category = Widgets)
-	UUserWidget* PlayerHUDWidget;
+	TObjectPtr<UUserWidget> PlayerHUDWidget;
 
 	UPROPERTY(EditAnywhere, Category = Widgets)
-	UUserWidget* EndScoreWidget;
+	TObjectPtr<UUserWidget> EndScoreWidget;
 
 	UFUNCTION(BlueprintCallable)
 	void DisplayEndScore();

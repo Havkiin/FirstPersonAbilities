@@ -27,7 +27,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Components)
-	UCapsuleComponent* TriggerZone;
+	TObjectPtr<UCapsuleComponent> TriggerZone;
 
 	UFUNCTION()
 	void HandleOverlap(AActor* OverlappedActor, AActor* OtherActor);
